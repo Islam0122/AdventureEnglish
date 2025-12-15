@@ -5,9 +5,7 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    full_name = serializers.CharField(
-        read_only=True
-    )
+    full_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = User
@@ -17,7 +15,9 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'full_name',
-            'role',
+            'level',
+            'points',
+            'completed_tests',
             'is_verified',
             'auth_type',
             'created_at'
@@ -25,22 +25,14 @@ class UserSerializer(serializers.ModelSerializer):
         read_only_fields = [
             'id',
             'email',
-            'role',
             'auth_type',
+            'is_verified',
             'created_at'
         ]
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-    full_name = serializers.CharField(
-        read_only=True
-    )
-    is_driver = serializers.BooleanField(
-        read_only=True
-    )
-    is_guest = serializers.BooleanField(
-        read_only=True
-    )
+    full_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = User
@@ -50,19 +42,18 @@ class UserDetailSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'full_name',
-            'role',
+            'level',
+            'points',
+            'completed_tests',
             'is_verified',
             'auth_type',
             'is_active',
-            'is_driver',
-            'is_guest',
             'created_at',
             'updated_at'
         ]
         read_only_fields = [
             'id',
             'email',
-            'role',
             'auth_type',
             'is_verified',
             'is_active',

@@ -1,10 +1,7 @@
-"""
-Сериализаторы для аутентификации
-"""
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from ..models import GuestProfile, DriverProfile
+from ..models import StudentProfile
 from .user_serializers import UserSerializer
 
 User = get_user_model()
@@ -22,10 +19,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         required=True,
         style={'input_type': 'password'}
     )
-    role = serializers.ChoiceField(
-        choices=['guest', 'driver'],
-        required=True
-    )
 
     class Meta:
         model = User
@@ -34,8 +27,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'password',
-            'password_confirm',
-            'role'
+            'password_confirm'
         ]
 
     def validate(self, attrs):
@@ -54,26 +46,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop('password_confirm')
-        role = validated_data.pop('role')
 
         user = User.objects.create_user(
             email=validated_data['email'],
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             password=validated_data['password'],
-            role=role,
             auth_type='local'
         )
 
-        if role == 'guest':
-            GuestProfile.objects.create(user=user)
-        elif role == 'driver':
-            DriverProfile.objects.create(
-                user=user,
-                phone_number='',
-                driver_license_number='',
-                driver_license_category=''
-            )
+        StudentProfile.objects.create(user=user)
 
         return user
 

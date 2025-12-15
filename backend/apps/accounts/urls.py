@@ -10,18 +10,13 @@ from .views import (
     PasswordResetRequestAPIView,
     PasswordResetConfirmAPIView,
     MeAPIView,
-    GuestProfileViewSet,
-    DriverProfileViewSet,
-    CarViewSet,
-    MyProfileAPIView,
+    StudentProfileViewSet,
 )
 
 app_name = 'accounts'
 
 router = DefaultRouter()
-router.register(r'profile/guest', GuestProfileViewSet, basename='guest-profile')
-router.register(r'profile/driver', DriverProfileViewSet, basename='driver-profile')
-router.register(r'car', CarViewSet, basename='car')
+router.register(r'profile', StudentProfileViewSet, basename='student-profile')
 
 urlpatterns = [
     # ===== Аутентификация =====
@@ -42,8 +37,7 @@ urlpatterns = [
 
     # ===== Текущий пользователь =====
     path('me/', MeAPIView.as_view(), name='me'),
-    path('my-profile/', MyProfileAPIView.as_view(), name='my-profile'),
 
-    # ===== Router URLs (профили и автомобили) =====
+    # ===== Router URLs (профиль студента) =====
     path('', include(router.urls)),
 ]

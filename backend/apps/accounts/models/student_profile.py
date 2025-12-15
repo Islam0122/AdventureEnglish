@@ -2,17 +2,11 @@ from django.db import models
 from django.core.validators import RegexValidator
 from .user import User
 
-
-from django.db import models
-from django.core.validators import RegexValidator
-from .user import User
-
-
 class StudentProfile(models.Model):
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
-        related_name='guest_profile',
+        related_name='student_profile',
         verbose_name='Пользователь'
     )
     avatar = models.ImageField(
@@ -36,7 +30,6 @@ class StudentProfile(models.Model):
         blank=True,
         verbose_name='Номер телефона'
     )
-
     birth_date = models.DateField(
         blank=True,
         null=True,
@@ -51,15 +44,14 @@ class StudentProfile(models.Model):
         auto_now=True,
         verbose_name='Дата обновления'
     )
-    statica kakie danny nujen
 
     class Meta:
-        verbose_name = 'Профиль гостя'
-        verbose_name_plural = 'Профили гостей'
+        verbose_name = 'Профиль студента'
+        verbose_name_plural = 'Профили студентов'
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"Профиль гостя: {self.user.email}"
+        return f"Профиль студента: {self.user.email}"
 
     @property
     def has_complete_profile(self):

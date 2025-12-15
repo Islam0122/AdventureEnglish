@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
 
     'apps.accounts',
+    'apps.test',
 ]
 
 MIDDLEWARE = [
@@ -125,7 +126,7 @@ GOOGLE_OAUTH2_CLIENT_SECRET = env('GOOGLE_OAUTH2_CLIENT_SECRET', default='')
 # --- Spectacular Settings ---
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Adventure English API',
-    'DESCRIPTION': 'API для платформы Adventure English - сервис такси и грузоперевозок',
+    'DESCRIPTION': 'API для платформы Adventure English - тестирование английского языка',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     'COMPONENT_SPLIT_REQUEST': True,

@@ -1,6 +1,3 @@
-"""
-Views для аутентификации
-"""
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -10,7 +7,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.conf import settings
-from django.core.mail import send_mail
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
@@ -25,14 +21,13 @@ from ..serializers import (
     TokenSerializer,
     UserSerializer
 )
-from ..models import GuestProfile
+from ..models import StudentProfile
 from ..utils.email import send_verification_email
 
 User = get_user_model()
 
 
 def get_tokens_for_user(user):
-    """Генерация JWT токенов для пользователя"""
     refresh = RefreshToken.for_user(user)
     return {
         'refresh': str(refresh),
@@ -167,12 +162,11 @@ class GoogleAuthAPIView(APIView):
                         'last_name': last_name,
                         'auth_type': 'google',
                         'is_verified': True,
-                        'role': 'guest'
                     }
                 )
 
                 if created:
-                    GuestProfile.objects.create(user=user)
+                    StudentProfile.objects.create(user=user)
 
                 tokens = get_tokens_for_user(user)
 
@@ -256,7 +250,7 @@ class PasswordResetRequestAPIView(APIView):
 
                 reset_link = f"{request.scheme}://{request.get_host()}/api/auth/password-reset-confirm/?token={token}&uid={uid}"
 
-                subject = 'Сброс пароля - Porter Kg'
+                subject = 'Сброс пароля - Adventure English'
                 message = f'''
 Здравствуйте, {user.first_name}!
 
@@ -266,9 +260,10 @@ class PasswordResetRequestAPIView(APIView):
 Если вы не запрашивали сброс пароля, проигнорируйте это письмо.
 
 С уважением,
-Команда Porter Kg
+Команда Adventure English
                 '''
 
+                from django.core.mail import send_mail
                 send_mail(
                     subject,
                     message,
@@ -278,7 +273,7 @@ class PasswordResetRequestAPIView(APIView):
                 )
 
             except User.DoesNotExist:
-                pass  # Для безопасности не говорим, что пользователь не найден
+                pass
             except Exception as e:
                 return Response({
                     'error': 'Ошибка отправки email'

@@ -10,19 +10,11 @@ from .auth_serializers import (
 from .user_serializers import (
     UserSerializer,
     UserDetailSerializer,
+    UserMinimalSerializer,
 )
-from .profile_serializers import (
-    GuestProfileSerializer,
-    GuestProfileDetailSerializer,
-    DriverProfileSerializer,
-    DriverProfileDetailSerializer,
-)
-from .car_serializers import (
-    CarSerializer,
-    CarDetailSerializer,
-    CarImageSerializer,
-    CarCreateUpdateSerializer,
-    CarImageUploadSerializer
+from .student_serializers import (
+    StudentProfileSerializer,
+    StudentProfileDetailSerializer,
 )
 
 __all__ = [
@@ -38,17 +30,9 @@ __all__ = [
     # User
     'UserSerializer',
     'UserDetailSerializer',
+    'UserMinimalSerializer',
 
-    # Profiles
-    'GuestProfileSerializer',
-    'GuestProfileDetailSerializer',
-    'DriverProfileSerializer',
-    'DriverProfileDetailSerializer',
-
-    # Car
-    'CarSerializer',
-    'CarDetailSerializer',
-    'CarImageSerializer',
-    'CarCreateUpdateSerializer',
-    'CarImageUploadSerializer',
+    # Student Profile
+    'StudentProfileSerializer',
+    'StudentProfileDetailSerializer',
 ]

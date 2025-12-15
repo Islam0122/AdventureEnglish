@@ -8,13 +8,8 @@ from .auth_views import (
     PasswordResetConfirmAPIView,
     MeAPIView,
 )
-from .profile_views import (
-    GuestProfileViewSet,
-    DriverProfileViewSet,
-    MyProfileAPIView,
-)
-from .car_views import (
-    CarViewSet,
+from .student_views import (
+    StudentProfileViewSet,
 )
 
 __all__ = [
@@ -28,11 +23,6 @@ __all__ = [
     'PasswordResetConfirmAPIView',
     'MeAPIView',
 
-    # Profile
-    'GuestProfileViewSet',
-    'DriverProfileViewSet',
-    'MyProfileAPIView',
-
-    # Car
-    'CarViewSet',
+    # Student Profile
+    'StudentProfileViewSet',
 ]

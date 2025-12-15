@@ -6,10 +6,6 @@ class AuthType(models.TextChoices):
     LOCAL = 'local', 'Local'
     GOOGLE = 'google', 'Google'
 
-class UserRole(models.TextChoices):
-    ADMIN = 'admin', 'Admin'
-    STUDENT = 'student', 'Student'
-
 class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, verbose_name='Email адрес')
     first_name = models.CharField(max_length=50, verbose_name='Имя')
@@ -25,29 +21,32 @@ class User(AbstractBaseUser, PermissionsMixin):
     completed_tests = models.IntegerField(default=0, verbose_name='Пройденные тесты')
 
     is_verified = models.BooleanField(default=False, verbose_name='Email подтвержден')
-    auth_type = models.CharField(max_length=10, choices=AuthType.choices, default=AuthType.LOCAL, verbose_name='Тип аутентификации')
-    role = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.STUDENT, verbose_name='Роль')
+    auth_type = models.CharField(
+        max_length=10,
+        choices=AuthType.choices,
+        default=AuthType.LOCAL,
+        verbose_name='Тип аутентификации'
+    )
 
     is_active = models.BooleanField(default=True, verbose_name='Активен')
     is_staff = models.BooleanField(default=False, verbose_name='Персонал')
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name']
 
     objects = UserManager()
 
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ['-created_at']
+
     @property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
-
-    def has_role(self, role: str) -> bool:
-        return self.role == role
-
-    def is_student(self):
-        return self.has_role(UserRole.STUDENT)
 
     def __str__(self):
         return f"{self.full_name} ({self.email})"
