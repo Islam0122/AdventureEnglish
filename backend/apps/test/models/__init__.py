@@ -1,17 +1,19 @@
-from .test import Test
-from .result import ResultsTest, PlacementTestResult
-from .quiz import Question
-from .basemodel import BaseModel
+from .base import BaseModel
 from .level import Level
-from .placementtest import PlacementTest, PlacementTest_Question
+from .category import TestCategory
+from .test import Test
+from .question import Question
+from .placement import PlacementTest, PlacementTest_Question
+from .result import ResultsTest, PlacementTestResult
 
 __all__ = [
-    'Test',
-    'ResultsTest',
-    'PlacementTestResult',
-    'Question',
     'BaseModel',
     'Level',
+    'TestCategory',
+    'Test',
+    'Question',
     'PlacementTest',
     'PlacementTest_Question',
+    'ResultsTest',
+    'PlacementTestResult',
 ]

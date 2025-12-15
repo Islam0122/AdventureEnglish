@@ -1,4 +1,4 @@
-from .basemodel import BaseModel
+from .base import BaseModel
 from .level import Level
 from django.db import models
 

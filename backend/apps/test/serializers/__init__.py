@@ -1,4 +1,4 @@
-from .level_serializers import *
+from .level import *
 from .test_serializers import *
 from .result_serializers import *
 from .PlacementTest_serializers import *

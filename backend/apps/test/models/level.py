@@ -1,6 +1,6 @@
 from django.db import models
 import logging
-from .basemodel import BaseModel
+from .base import BaseModel
 
 logger = logging.getLogger(__name__)
 

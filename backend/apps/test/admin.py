@@ -1,219 +1,342 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Level, Test, Question, ResultsTest ,PlacementTest ,PlacementTest_Question,PlacementTestResult
-from .forms.forms import QuestionForm
+from django.db.models import Count, Avg
+from .models import (
+    Level, TestCategory, Test, Question,
+    PlacementTest, PlacementTest_Question,
+    ResultsTest, PlacementTestResult
+)
 
-# =========================
-# LevelAdmin
-# =========================
+
 @admin.register(Level)
 class LevelAdmin(admin.ModelAdmin):
-    list_display = ("title", "description_short")
-    search_fields = ("title", "description")
+    list_display = ['title', 'test_count', 'description_short', 'created_at']
+    search_fields = ['title', 'description']
+    readonly_fields = ['created_at', 'updated_at']
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            _test_count=Count('test')
+        )
+
+    def test_count(self, obj):
+        return obj._test_count
+
+    test_count.short_description = 'Тестов'
+    test_count.admin_order_field = '_test_count'
 
     def description_short(self, obj):
-        return (obj.description[:50] + "...") if obj.description else "—"
-    description_short.short_description = "Описание"
+        return (obj.description[:100] + '...') if len(obj.description or '') > 100 else obj.description
+
+    description_short.short_description = 'Описание'
 
 
-# =========================
-# QuestionInline для Test
-# =========================
-class QuestionInline(admin.StackedInline):
-    model = Question
-    form = QuestionForm
-    extra = 1
-    show_change_link = True
+@admin.register(TestCategory)
+class TestCategoryAdmin(admin.ModelAdmin):
+    list_display = ['display_name', 'name', 'icon_preview', 'test_count', 'order', 'is_active_badge']
+    list_filter = ['is_active', 'name']
+    search_fields = ['display_name', 'description']
+    ordering = ['order', 'display_name']
+    readonly_fields = ['created_at', 'updated_at']
+
     fieldsets = (
-        ("Основное", {
-            "fields": ("text", "question_type", "correct_answer")
+        ('Основное', {
+            'fields': ('name', 'display_name', 'description')
         }),
-        ("Варианты для MCQ", {
-            "fields": ("option_a", "option_b", "option_c", "option_d"),
-            "classes": ("collapse",),
+        ('Отображение', {
+            'fields': ('icon', 'order', 'is_active')
         }),
-        ("Дополнительно", {
-            "fields": ("translation", "image", "audio_file"),
-            "classes": ("collapse",),
+        ('Системное', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     )
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            _test_count=Count('tests')
+        )
 
-# =========================
-# TestAdmin с Inline
-# =========================
+    def test_count(self, obj):
+        return obj._test_count
+
+    test_count.short_description = 'Тестов'
+    test_count.admin_order_field = '_test_count'
+
+    def icon_preview(self, obj):
+        if obj.icon:
+            return format_html('<span style="font-size: 24px;">{}</span>', obj.icon)
+        return '-'
+
+    icon_preview.short_description = 'Иконка'
+
+    def is_active_badge(self, obj):
+        if obj.is_active:
+            return format_html('<span style="color: green;">✓ Активна</span>')
+        return format_html('<span style="color: red;">✗ Неактивна</span>')
+
+    is_active_badge.short_description = 'Статус'
+
+
+class QuestionInline(admin.TabularInline):
+    model = Question
+    extra = 0
+    fields = ['text', 'question_type', 'correct_answer', 'points', 'is_active']
+    readonly_fields = []
+    show_change_link = True
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('level')
+
+
 @admin.register(Test)
 class TestAdmin(admin.ModelAdmin):
-    list_display = ("name", "level", "description_short")
-    list_filter = ("level",)
-    search_fields = ("name", "description")
-    inlines = [QuestionInline]  # здесь добавляем вопросы прямо в Test
-
-    def description_short(self, obj):
-        return (obj.description[:50] + "...") if obj.description else "—"
-    description_short.short_description = "Описание"
-
-
-# =========================
-# QuestionAdmin отдельно
-# =========================
-@admin.register(Question)
-class QuestionAdmin(admin.ModelAdmin):
-    form = QuestionForm
-
-    list_display = ("text_short", "question_type", "test", "has_media")
-    list_filter = ("question_type", "test__level")
-    search_fields = ("text",)
+    list_display = [
+        'name', 'level', 'category_badge', 'question_count',
+        'avg_score', 'is_active_badge', 'created_at'
+    ]
+    list_filter = ['level', 'category', 'test_type', 'is_active']
+    search_fields = ['name', 'description']
+    ordering = ['level', 'category', 'name']
+    readonly_fields = ['created_at', 'updated_at', 'total_attempts', 'average_score']
+    inlines = [QuestionInline]
 
     fieldsets = (
-        ("Основное", {
-            "fields": ("test", "text", "question_type", "correct_answer")
+        ('Основное', {
+            'fields': ('name', 'description', 'level', 'category')
         }),
-        ("Варианты для MCQ", {
-            "fields": ("option_a", "option_b", "option_c", "option_d"),
-            "classes": ("collapse",),
+        ('Настройки', {
+            'fields': (
+                'test_type', 'duration_minutes', 'passing_score',
+                'max_attempts', 'is_active', 'is_public'
+            )
         }),
-        ("Дополнительно", {
-            "fields": ("translation", "image", "audio_file"),
-            "classes": ("collapse",),
+        ('Статистика', {
+            'fields': ('total_attempts', 'average_score'),
+            'classes': ('collapse',)
+        }),
+        ('Системное', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.select_related('level', 'category').annotate(
+            _question_count=Count('questions'),
+            _avg_score=Avg('results__percentage')
+        )
+
+    def question_count(self, obj):
+        return obj._question_count
+
+    question_count.short_description = 'Вопросов'
+    question_count.admin_order_field = '_question_count'
+
+    def avg_score(self, obj):
+        if obj._avg_score:
+            return f"{obj._avg_score:.1f}%"
+        return "-"
+
+    avg_score.short_description = 'Средний балл'
+    avg_score.admin_order_field = '_avg_score'
+
+    def category_badge(self, obj):
+        if obj.category:
+            return format_html(
+                '<span style="background: #f0f0f0; padding: 3px 8px; border-radius: 3px;">{} {}</span>',
+                obj.category.icon or '',
+                obj.category.display_name
+            )
+        return '-'
+
+    category_badge.short_description = 'Категория'
+
+    def is_active_badge(self, obj):
+        if obj.is_active:
+            return format_html('<span style="color: green;">✓</span>')
+        return format_html('<span style="color: red;">✗</span>')
+
+    is_active_badge.short_description = 'Активен'
+
+
+
+@admin.register(Question)
+class QuestionAdmin(admin.ModelAdmin):
+    list_display = [
+        'text_short', 'test', 'question_type',
+        'level', 'points', 'has_media', 'is_active'
+    ]
+    list_filter = ['question_type', 'test__level', 'is_active']
+    search_fields = ['text', 'test__name']
+    ordering = ['test', 'order']
+    readonly_fields = ['created_at', 'updated_at']
+
+    fieldsets = (
+        ('Основное', {
+            'fields': ('test', 'level', 'text', 'question_type', 'order')
+        }),
+        ('Варианты (MCQ)', {
+            'fields': ('option_a', 'option_b', 'option_c', 'option_d'),
+            'classes': ('collapse',)
+        }),
+        ('Ответ', {
+            'fields': ('correct_answer', 'explanation', 'hint', 'points')
+        }),
+        ('Дополнительно', {
+            'fields': ('translation', 'image', 'audio_file', 'is_active'),
+            'classes': ('collapse',)
+        }),
+        ('Системное', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     )
 
     def text_short(self, obj):
-        return obj.text[:50] + ("..." if len(obj.text) > 50 else "")
-    text_short.short_description = "Вопрос"
+        return obj.text[:80] + ('...' if len(obj.text) > 80 else '')
+
+    text_short.short_description = 'Вопрос'
 
     def has_media(self, obj):
-        return bool(obj.image or obj.audio_file)
-    has_media.boolean = True
-    has_media.short_description = "Медиа"
+        media = []
+        if obj.image:
+            media.append('📷')
+        if obj.audio_file:
+            media.append('🔊')
+        return ' '.join(media) if media else '-'
+
+    has_media.short_description = 'Медиа'
 
 
-# =========================
-# ResultsTestAdmin
-# =========================
 @admin.register(ResultsTest)
 class ResultsTestAdmin(admin.ModelAdmin):
-    list_display = ("name", "email", "test", "score", "percentage", "certificate_preview", "created_at")
-    list_filter = ("test__level", "created_at")
-    search_fields = ("name", "email", "test__name")
-    readonly_fields = ("percentage", "certificate", "created_at", "updated_at")
+    list_display = [
+        'name', 'email', 'test', 'percentage_badge',
+        'correct_answers', 'has_certificate', 'created_at'
+    ]
+    list_filter = ['test__level', 'created_at']
+    search_fields = ['name', 'email', 'test__name']
+    ordering = ['-created_at']
+    readonly_fields = ['percentage', 'certificate', 'created_at', 'updated_at']
 
-    def certificate_preview(self, obj):
-        if obj.certificate:
-            return f"<a href='{obj.certificate.url}' target='_blank'>📄 Открыть</a>"
-        return "—"
-    certificate_preview.allow_tags = True
-    certificate_preview.short_description = "Сертификат"
-
-
-class PlacementTestQuestionInline(admin.StackedInline):
-    model = PlacementTest_Question
-    extra = 1
     fieldsets = (
-        ("Основное", {
-            "fields": ("text","level", "question_type", "correct_answer")
+        ('Пользователь', {
+            'fields': ('name', 'email')
         }),
-        ("Варианты для MCQ", {
-            "fields": ("option_a", "option_b", "option_c", "option_d"),
-            "classes": ("collapse",),
+        ('Тест', {
+            'fields': ('test',)
         }),
-        ("Дополнительно", {
-            "fields": ( "image", "audio_file"),
-            "classes": ("collapse",),
+        ('Результаты', {
+            'fields': (
+                'score', 'total_questions',
+                'correct_answers', 'wrong_answers', 'percentage'
+            )
+        }),
+        ('Сертификат', {
+            'fields': ('certificate',)
+        }),
+        ('Системное', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
         }),
     )
-    show_change_link = True
+
+    def percentage_badge(self, obj):
+        color = 'green' if obj.percentage >= 70 else 'orange' if obj.percentage >= 50 else 'red'
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{:.1f}%</span>',
+            color, obj.percentage
+        )
+
+    percentage_badge.short_description = 'Процент'
+    percentage_badge.admin_order_field = 'percentage'
+
+    def has_certificate(self, obj):
+        if obj.certificate:
+            return format_html('<a href="{}" target="_blank">📄 Открыть</a>', obj.certificate.url)
+        return '-'
+
+    has_certificate.short_description = 'Сертификат'
+
 
 
 @admin.register(PlacementTest)
 class PlacementTestAdmin(admin.ModelAdmin):
-    list_display = ("name", "description")
-    search_fields = ("name", "description")
-    inlines = [PlacementTestQuestionInline]
+    list_display = ['name', 'question_count', 'result_count', 'created_at']
+    search_fields = ['name', 'description']
+    readonly_fields = ['created_at', 'updated_at']
 
-    def has_add_permission(self, request):
-        return False
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            _question_count=Count('questions'),
+            _result_count=Count('results')
+        )
 
-    def has_delete_permission(self, request, obj=None):
-        return False
+    def question_count(self, obj):
+        return obj._question_count
+
+    question_count.short_description = 'Вопросов'
+
+    def result_count(self, obj):
+        return obj._result_count
+
+    result_count.short_description = 'Результатов'
 
 
 @admin.register(PlacementTest_Question)
 class PlacementTestQuestionAdmin(admin.ModelAdmin):
-    list_display = ("short_text", "test", "level", "question_type", "correct_answer")
-    list_filter = ("test", "level", "question_type")
-    search_fields = ("text", "correct_answer")
-    ordering = ("test", "level")
+    list_display = ['text_short', 'test', 'level', 'question_type']
+    list_filter = ['test', 'level', 'question_type']
+    search_fields = ['text']
+    ordering = ['test', 'level']
 
-    fieldsets = (
-        ("Основное", {
-            "fields": ("test", "level", "text", "question_type")
-        }),
-        ("Варианты ответа (MCQ)", {
-            "fields": ("option_a", "option_b", "option_c", "option_d"),
-            "classes": ("collapse",),  # сворачиваем, если не нужно
-        }),
-        ("Правильный ответ", {
-            "fields": ("correct_answer",)
-        }),
-        ("Медиа", {
-            "fields": ("image", "audio_file"),
-            "classes": ("collapse",),
-        }),
-    )
+    def text_short(self, obj):
+        return obj.text[:80] + ('...' if len(obj.text) > 80 else '')
 
-    def short_text(self, obj):
-        return obj.text[:50] + ("..." if len(obj.text) > 50 else "")
-    short_text.short_description = "Вопрос"
+    text_short.short_description = 'Вопрос'
 
 
 @admin.register(PlacementTestResult)
 class PlacementTestResultAdmin(admin.ModelAdmin):
-    list_display = (
-        "id", "name", "email", "test", "level",
-        "score", "correct_answers", "wrong_answers",
-        "percentage", "created_at",
-    )
-    list_filter = ("test", "level", "created_at")
-    search_fields = ("name", "email", "test__name")
-    ordering = ("-created_at",)
+    list_display = [
+        'name', 'email', 'test', 'level_badge',
+        'percentage_badge', 'created_at'
+    ]
+    list_filter = ['test', 'level', 'created_at']
+    search_fields = ['name', 'email']
+    ordering = ['-created_at']
+    readonly_fields = [
+        'created_at', 'updated_at', 'percentage',
+        'correct_answers', 'wrong_answers', 'score'
+    ]
 
-    readonly_fields = (
-        "created_at", "updated_at", "percentage", "wrong_answers",
-        "score", "certificate",
-        "level_a1_correct", "level_a2_correct", "level_b1_correct",
-        "level_b2_correct", "level_c1_correct", "level_c2_correct"
-    )
-
-    fieldsets = (
-        ("Информация о пользователе", {
-            "fields": ("name", "email")
-        }),
-        ("Тест", {
-            "fields": ("test", "level")
-        }),
-        ("Результаты", {
-            "fields": (
-                "score", "total_questions", "correct_answers",
-                "wrong_answers", "percentage"
+    def level_badge(self, obj):
+        if obj.level:
+            colors = {
+                'A1': '#ff6b6b', 'A2': '#ffa06b',
+                'B1': '#ffd56b', 'B2': '#a8e063',
+                'C1': '#56ccf2', 'C2': '#8b5cf6'
+            }
+            color = colors.get(obj.level.title, '#gray')
+            return format_html(
+                '<span style="background: {}; color: white; padding: 3px 10px; border-radius: 3px; font-weight: bold;">{}</span>',
+                color, obj.level.title
             )
-        }),
-        ("Подробные результаты по уровням", {
-            "fields": (
-                "level_a1_correct", "level_a2_correct",
-                "level_b1_correct", "level_b2_correct",
-                "level_c1_correct", "level_c2_correct"
-            )
-        }),
-        ("Сертификат", {
-            "fields": ("certificate",)
-        }),
-        ("Системное", {
-            "fields": ("created_at", "updated_at"),
-        }),
-    )
+        return '-'
 
-    def has_add_permission(self, request):
-        return False
+    level_badge.short_description = 'Уровень'
 
+    def percentage_badge(self, obj):
+        color = 'green' if obj.percentage >= 70 else 'orange' if obj.percentage >= 50 else 'red'
+        return format_html(
+            '<span style="color: {}; font-weight: bold;">{:.1f}%</span>',
+            color, obj.percentage
+        )
+
+    percentage_badge.short_description = 'Процент'
