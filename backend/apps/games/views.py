@@ -16,7 +16,7 @@ class GameViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.Gen
 
 class GameResultViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.GenericViewSet):
     serializer_class = GameResultSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return GameResult.objects.filter(user=self.request.user).select_related("game")
@@ -28,7 +28,7 @@ class GameResultViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets
 class HangmanWordViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = HangmanWord.objects.all()
     serializer_class = HangmanWordSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 
 class WordQuizQuestionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
