@@ -30,7 +30,10 @@ INSTALLED_APPS = [
 
     'apps.accounts',
     'apps.feedback',
-    # 'apps.test',
+    'apps.games',
+    'apps.achievements',
+    'apps.ai_chat',
+    # 'apps.tests_engine',
 ]
 
 MIDDLEWARE = [

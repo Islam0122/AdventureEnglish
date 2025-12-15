@@ -13,7 +13,7 @@ class ResultsTestViewSet(
     viewsets.GenericViewSet
 ):
 
-    queryset = ResultsTest.objects.all().select_related("test", "test__level")
+    queryset = ResultsTest.objects.all().select_related("tests_engine", "test__level")
     permission_classes = [permissions.AllowAny]
 
     def get_serializer_class(self):

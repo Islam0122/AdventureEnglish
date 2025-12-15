@@ -17,7 +17,7 @@ class LevelAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.annotate(
-            _test_count=Count('test')
+            _test_count=Count('tests_engine')
         )
 
     def test_count(self, obj):
@@ -168,17 +168,17 @@ class TestAdmin(admin.ModelAdmin):
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
     list_display = [
-        'text_short', 'test', 'question_type',
+        'text_short', 'tests_engine', 'question_type',
         'level', 'points', 'has_media', 'is_active'
     ]
     list_filter = ['question_type', 'test__level', 'is_active']
     search_fields = ['text', 'test__name']
-    ordering = ['test', 'order']
+    ordering = ['tests_engine', 'order']
     readonly_fields = ['created_at', 'updated_at']
 
     fieldsets = (
         ('Основное', {
-            'fields': ('test', 'level', 'text', 'question_type', 'order')
+            'fields': ('tests_engine', 'level', 'text', 'question_type', 'order')
         }),
         ('Варианты (MCQ)', {
             'fields': ('option_a', 'option_b', 'option_c', 'option_d'),
@@ -216,7 +216,7 @@ class QuestionAdmin(admin.ModelAdmin):
 @admin.register(ResultsTest)
 class ResultsTestAdmin(admin.ModelAdmin):
     list_display = [
-        'name', 'email', 'test', 'percentage_badge',
+        'name', 'email', 'tests_engine', 'percentage_badge',
         'correct_answers', 'has_certificate', 'created_at'
     ]
     list_filter = ['test__level', 'created_at']
@@ -229,7 +229,7 @@ class ResultsTestAdmin(admin.ModelAdmin):
             'fields': ('name', 'email')
         }),
         ('Тест', {
-            'fields': ('test',)
+            'fields': ('tests_engine',)
         }),
         ('Результаты', {
             'fields': (
@@ -291,10 +291,10 @@ class PlacementTestAdmin(admin.ModelAdmin):
 
 @admin.register(PlacementTest_Question)
 class PlacementTestQuestionAdmin(admin.ModelAdmin):
-    list_display = ['text_short', 'test', 'level', 'question_type']
-    list_filter = ['test', 'level', 'question_type']
+    list_display = ['text_short', 'tests_engine', 'level', 'question_type']
+    list_filter = ['tests_engine', 'level', 'question_type']
     search_fields = ['text']
-    ordering = ['test', 'level']
+    ordering = ['tests_engine', 'level']
 
     def text_short(self, obj):
         return obj.text[:80] + ('...' if len(obj.text) > 80 else '')
@@ -305,10 +305,10 @@ class PlacementTestQuestionAdmin(admin.ModelAdmin):
 @admin.register(PlacementTestResult)
 class PlacementTestResultAdmin(admin.ModelAdmin):
     list_display = [
-        'name', 'email', 'test', 'level_badge',
+        'name', 'email', 'tests_engine', 'level_badge',
         'percentage_badge', 'created_at'
     ]
-    list_filter = ['test', 'level', 'created_at']
+    list_filter = ['tests_engine', 'level', 'created_at']
     search_fields = ['name', 'email']
     ordering = ['-created_at']
     readonly_fields = [

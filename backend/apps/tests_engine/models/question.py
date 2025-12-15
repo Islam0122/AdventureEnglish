@@ -108,9 +108,9 @@ class Question(BaseModel):
     class Meta:
         verbose_name = "Вопрос"
         verbose_name_plural = "Вопросы"
-        ordering = ['test', 'order', 'id']
+        ordering = ['tests_engine', 'order', 'id']
         indexes = [
-            models.Index(fields=['test', 'order']),
+            models.Index(fields=['tests_engine', 'order']),
             models.Index(fields=['question_type']),
             models.Index(fields=['is_active']),
         ]

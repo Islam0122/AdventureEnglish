@@ -100,7 +100,7 @@ class TestAttempt(BaseModel):
         verbose_name_plural = "Попытки тестов"
         ordering = ['-created_at']
         indexes = [
-            models.Index(fields=['user', 'test']),
+            models.Index(fields=['user', 'tests_engine']),
             models.Index(fields=['is_completed', 'created_at']),
         ]
 

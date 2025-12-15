@@ -56,8 +56,8 @@ class Migration(migrations.Migration):
                 ('correct_answer', models.TextField(verbose_name='Правильный ответ')),
                 ('image', models.ImageField(blank=True, null=True, upload_to='questions_images/')),
                 ('audio_file', models.FileField(blank=True, null=True, upload_to='questions_audio/')),
-                ('level', models.ForeignKey(blank=True, help_text='К какому уровню относится вопрос (например, A2)', null=True, on_delete=django.db.models.deletion.SET_NULL, to='test.level', verbose_name='Уровень вопроса')),
-                ('test', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='test.placementtest', verbose_name='Тест')),
+                ('level', models.ForeignKey(blank=True, help_text='К какому уровню относится вопрос (например, A2)', null=True, on_delete=django.db.models.deletion.SET_NULL, to='tests_engine.level', verbose_name='Уровень вопроса')),
+                ('tests_engine', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='tests_engine.placementtest', verbose_name='Тест')),
             ],
             options={
                 'verbose_name': 'Placement Test Вопрос',
@@ -84,8 +84,8 @@ class Migration(migrations.Migration):
                 ('level_c1_correct', models.PositiveIntegerField(default=0)),
                 ('level_c2_correct', models.PositiveIntegerField(default=0)),
                 ('certificate', models.FileField(blank=True, null=True, upload_to='certificates/', verbose_name='Сертификат (PDF)')),
-                ('level', models.ForeignKey(blank=True, help_text='Какой уровень был определён по результатам теста', null=True, on_delete=django.db.models.deletion.SET_NULL, to='test.level', verbose_name='Определённый уровень')),
-                ('test', models.ForeignKey(help_text='Выберите тест, который прошёл пользователь', on_delete=django.db.models.deletion.CASCADE, related_name='results', to='test.placementtest', verbose_name='Тест')),
+                ('level', models.ForeignKey(blank=True, help_text='Какой уровень был определён по результатам теста', null=True, on_delete=django.db.models.deletion.SET_NULL, to='tests_engine.level', verbose_name='Определённый уровень')),
+                ('tests_engine', models.ForeignKey(help_text='Выберите тест, который прошёл пользователь', on_delete=django.db.models.deletion.CASCADE, related_name='results', to='tests_engine.placementtest', verbose_name='Тест')),
             ],
             options={
                 'verbose_name': 'Результат Placement теста',
@@ -101,7 +101,7 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True, verbose_name='Дата обновления')),
                 ('name', models.CharField(help_text="Название темы теста, например 'Грамматика A1'", max_length=100, unique=True, verbose_name='Название теста')),
                 ('description', models.TextField(blank=True, help_text='Описание теста и его особенности', null=True, verbose_name='Описание теста')),
-                ('level', models.ForeignKey(help_text='Выберите уровень CEFR, к которому относится тест', on_delete=django.db.models.deletion.CASCADE, to='test.level', verbose_name='Уровень теста')),
+                ('level', models.ForeignKey(help_text='Выберите уровень CEFR, к которому относится тест', on_delete=django.db.models.deletion.CASCADE, to='tests_engine.level', verbose_name='Уровень теста')),
             ],
             options={
                 'verbose_name': 'Тест',
@@ -123,7 +123,7 @@ class Migration(migrations.Migration):
                 ('wrong_answers', models.PositiveIntegerField(verbose_name='Неправильные ответы')),
                 ('percentage', models.DecimalField(decimal_places=2, max_digits=5, verbose_name='Процент правильных ответов')),
                 ('certificate', models.FileField(blank=True, null=True, upload_to='certificates/', verbose_name='Сертификат (PDF)')),
-                ('test', models.ForeignKey(help_text='Выберите тест, который прошёл пользователь', on_delete=django.db.models.deletion.CASCADE, related_name='results', to='test.test', verbose_name='Тест')),
+                ('tests_engine', models.ForeignKey(help_text='Выберите тест, который прошёл пользователь', on_delete=django.db.models.deletion.CASCADE, related_name='results', to='tests_engine.tests_engine', verbose_name='Тест')),
             ],
             options={
                 'verbose_name': 'Результат теста',
@@ -147,12 +147,12 @@ class Migration(migrations.Migration):
                 ('translation', models.CharField(blank=True, help_text='Подсказка или перевод для вопросов на перевод', max_length=255, null=True, verbose_name='Перевод / подсказка')),
                 ('image', models.ImageField(blank=True, help_text='При необходимости добавьте изображение к вопросу', null=True, upload_to='questions_images/', verbose_name='Изображение')),
                 ('audio_file', models.FileField(blank=True, help_text='При необходимости добавьте аудио для вопросов типа Listening', null=True, upload_to='questions_audio/', verbose_name='Аудио файл')),
-                ('test', models.ForeignKey(help_text='Выберите тест, к которому относится вопрос', on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='test.test', verbose_name='Тест')),
+                ('tests_engine', models.ForeignKey(help_text='Выберите тест, к которому относится вопрос', on_delete=django.db.models.deletion.CASCADE, related_name='questions', to='tests_engine.tests_engine', verbose_name='Тест')),
             ],
             options={
                 'verbose_name': 'Вопрос',
                 'verbose_name_plural': 'Вопросы',
-                'ordering': ['test', 'id'],
+                'ordering': ['tests_engine', 'id'],
             },
         ),
     ]

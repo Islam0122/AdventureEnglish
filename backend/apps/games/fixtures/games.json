@@ -1,0 +1,114 @@
+[
+  {
+    "model": "games.game",
+    "pk": 1,
+    "fields": {
+      "title": "Hangman - Отгадай слово",
+      "description": "Отгадай слово по буквам. Ошибки сокращают очки.",
+      "game_type": "hangman",
+      "level": "easy",
+      "is_active": true,
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.game",
+    "pk": 2,
+    "fields": {
+      "title": "Word Quiz",
+      "description": "Выбери правильный перевод слова из вариантов.",
+      "game_type": "word_quiz",
+      "level": "medium",
+      "is_active": true,
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.game",
+    "pk": 3,
+    "fields": {
+      "title": "Listening - Аудирование",
+      "description": "Прослушай аудио и выбери правильный вариант ответа.",
+      "game_type": "listening",
+      "level": "medium",
+      "is_active": true,
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.game",
+    "pk": 4,
+    "fields": {
+      "title": "Grammar - Грамматика",
+      "description": "Выбери правильный вариант грамматической конструкции.",
+      "game_type": "grammar",
+      "level": "medium",
+      "is_active": true,
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.hangmanword",
+    "pk": 5,
+    "fields": {
+      "word": "language",
+      "hint": "Основной способ общения людей",
+      "level": "easy",
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.hangmanword",
+    "pk": 6,
+    "fields": {
+      "word": "computer",
+      "hint": "Электронная машина для работы и игр",
+      "level": "easy",
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.wordquizquestion",
+    "pk": 7,
+    "fields": {
+      "question": "Выбери правильный перевод слова 'apple'",
+      "options": ["яблоко","банан","груша","виноград"],
+      "correct_answer": "яблоко",
+      "level": "easy",
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.wordquizquestion",
+    "pk": 8,
+    "fields": {
+      "question": "Выбери правильный перевод слова 'cat'",
+      "options": ["собака","кот","корова","птица"],
+      "correct_answer": "кот",
+      "level": "easy",
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.listeningquestion",
+    "pk": 9,
+    "fields": {
+      "audio_file": "listening/audio1.mp3",
+      "options": ["cat","dog","bird","fish"],
+      "correct_answer": "cat",
+      "level": "easy",
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  },
+  {
+    "model": "games.grammarquestion",
+    "pk": 10,
+    "fields": {
+      "question": "Выбери правильный вариант: He ___ to school every day.",
+      "options": ["go","goes","going","gone"],
+      "correct_answer": "goes",
+      "level": "easy",
+      "created_at": "2025-12-15T12:00:00Z"
+    }
+  }
+]

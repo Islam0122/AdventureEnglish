@@ -10,16 +10,16 @@ from .views import (
     PlacementTestResultViewSet
 )
 
-app_name = 'test'
+app_name = 'tests_engine'
 
 router = DefaultRouter()
 
 router.register(r'levels', LevelViewSet, basename='level')
 router.register(r'categories', TestCategoryViewSet, basename='category')
-router.register(r'tests', TestViewSet, basename='test')
+router.register(r'tests', TestViewSet, basename='tests_engine')
 router.register(r'questions', QuestionViewSet, basename='question')
 router.register(r'results', ResultsTestViewSet, basename='result')
-router.register(r'placement-tests', PlacementTestViewSet, basename='placement-test')
+router.register(r'placement-tests', PlacementTestViewSet, basename='placement-tests_engine')
 router.register(r'placement-results', PlacementTestResultViewSet, basename='placement-result')
 
 urlpatterns = [
