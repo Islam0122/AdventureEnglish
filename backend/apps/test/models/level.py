@@ -5,9 +5,7 @@ from .basemodel import BaseModel
 logger = logging.getLogger(__name__)
 
 
-# ===========================
-# Уровень (Level)
-# ===========================
+
 class Level(BaseModel):
     title = models.CharField(
         max_length=100,

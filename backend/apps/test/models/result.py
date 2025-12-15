@@ -16,9 +16,7 @@ from .level import Level
 
 logger = logging.getLogger(__name__)
 
-# ===========================
-# Результат теста + Сертификат
-# ===========================
+
 class ResultsTest(BaseModel):
     test = models.ForeignKey(
         Test,
@@ -47,9 +45,6 @@ class ResultsTest(BaseModel):
 
 
 
-# ===========================
-# Результат теста + Сертификат
-# ===========================
 class PlacementTestResult(BaseModel):
     """Результат прохождения Placement Test"""
 

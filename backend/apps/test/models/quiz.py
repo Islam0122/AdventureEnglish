@@ -34,7 +34,6 @@ class Question(BaseModel):
         help_text="Выберите тип вопроса"
     )
 
-    # Multiple Choice варианты
     option_a = models.CharField(max_length=255, blank=True, null=True, verbose_name="Вариант A")
     option_b = models.CharField(max_length=255, blank=True, null=True, verbose_name="Вариант B")
     option_c = models.CharField(max_length=255, blank=True, null=True, verbose_name="Вариант C")

@@ -24,6 +24,7 @@ from ..serializers import (
 from ..models import StudentProfile
 from ..utils.email import send_verification_email
 
+
 User = get_user_model()
 
 
@@ -105,6 +106,7 @@ class LoginAPIView(APIView):
 
 class LogoutAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = None
 
     @extend_schema(
         description="Выход пользователя из системы"
@@ -191,6 +193,7 @@ class GoogleAuthAPIView(APIView):
 
 class VerifyEmailAPIView(APIView):
     permission_classes = [AllowAny]
+    serializer_class = None
 
     @extend_schema(
         parameters=[
